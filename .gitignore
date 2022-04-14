@@ -1,0 +1,7 @@
+Data/*/*
+!Data/placeholder.txt
+CheckPoint/*
+!CheckPoint/placeholder.txt
+__pycache__
+*.pyc
+.idea/*
