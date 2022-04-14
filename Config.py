@@ -5,7 +5,7 @@
 import os
 
 # -----Project Setting-----#
-PROJECT_ROOT = r'C:\WorkSpace\Polyp-Segmentation-Framework'
+PROJECT_ROOT = r'C:\WorkSpace\Polyp-Segmentation-Networks'
 DATASET_ROOT = os.path.join(PROJECT_ROOT, 'Data')
 CHECKPOINT_ROOT = os.path.join(PROJECT_ROOT, 'CheckPoint')
 
