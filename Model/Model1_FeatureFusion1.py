@@ -29,7 +29,8 @@ class DownsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DownsampleBlock, self).__init__()
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels - in_channels, kernel_size=3, stride=2, padding=1, bias=False)
+        self.conv = nn.Conv2d(in_channels=in_channels, out_channels=out_channels - in_channels, kernel_size=3, stride=2,
+                              padding=1, bias=False)
         self.bn = nn.BatchNorm2d(num_features=out_channels)
         self.relu = nn.ReLU(inplace=True)
 
@@ -44,7 +45,8 @@ class DownsampleBlock(nn.Module):
 class UpsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(UpsampleBlock, self).__init__()
-        self.conv = nn.ConvTranspose2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2, padding=1, output_padding=1, bias=False)
+        self.conv = nn.ConvTranspose2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, stride=2,
+                                       padding=1, output_padding=1, bias=False)
         self.bn = nn.BatchNorm2d(num_features=out_channels)
         self.relu = nn.ReLU(inplace=True)
 
@@ -54,23 +56,26 @@ class UpsampleBlock(nn.Module):
         out = self.relu(out)
         return out
 
+
 class FeatureFusion1(nn.Module):
     def __init__(self, decoder_in_channels, encoder_in_channels):
         super(FeatureFusion1, self).__init__()
         self.channel_attention = ChannelAttention(in_out_channels=encoder_in_channels)
         self.spatial_attention = SpatialAttention()
         #
-        self.decoder_conv = nn.Conv2d(in_channels=decoder_in_channels, out_channels=encoder_in_channels, kernel_size=1, stride=1, padding=0, bias=False)
+        self.decoder_conv = nn.Conv2d(in_channels=decoder_in_channels, out_channels=encoder_in_channels, kernel_size=1,
+                                      stride=1, padding=0, bias=False)
         self.decoder_conv_bn = nn.BatchNorm2d(num_features=encoder_in_channels)
         #
-        self.encoder_conv = nn.Conv2d(in_channels=encoder_in_channels, out_channels=encoder_in_channels, kernel_size=1, stride=1, padding=0, bias=False)
+        self.encoder_conv = nn.Conv2d(in_channels=encoder_in_channels, out_channels=encoder_in_channels, kernel_size=1,
+                                      stride=1, padding=0, bias=False)
         self.encoder_conv_bn = nn.BatchNorm2d(num_features=encoder_in_channels)
         #
 
     def forward(self, decoder_feature=None, encoder_feature=None):
         # decoder
         decoder = self.decoder_conv_bn(self.decoder_conv(decoder_feature))
-        decoder = F.interpolate(decoder, scale_factor=2, mode='bilinear', align_corners=True)
+        # decoder = F.interpolate(decoder, scale_factor=2, mode='bilinear', align_corners=True)
         decoder_spatial_score = self.spatial_attention(decoder)
 
         # encoder
@@ -82,13 +87,16 @@ class FeatureFusion1(nn.Module):
         out = torch.mul(self.channel_attention(out), out)
         return out
 
+
 class ChannelAttention(nn.Module):
     def __init__(self, in_out_channels, reduction_ratio=8):
         super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(output_size=1)
         self.max_pool = nn.AdaptiveAvgPool2d(output_size=1)
-        self.conv1 = nn.Conv2d(in_channels=in_out_channels, out_channels=in_out_channels // reduction_ratio, kernel_size=1, stride=1, padding=0, bias=False)
-        self.conv2 = nn.Conv2d(in_channels=in_out_channels // reduction_ratio, out_channels=in_out_channels, kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv1 = nn.Conv2d(in_channels=in_out_channels, out_channels=in_out_channels // reduction_ratio,
+                               kernel_size=1, stride=1, padding=0, bias=False)
+        self.conv2 = nn.Conv2d(in_channels=in_out_channels // reduction_ratio, out_channels=in_out_channels,
+                               kernel_size=1, stride=1, padding=0, bias=False)
         self.relu = nn.ReLU(inplace=True)
         self.sigmoid = nn.Sigmoid()
 
@@ -101,7 +109,8 @@ class ChannelAttention(nn.Module):
 class SpatialAttention(nn.Module):
     def __init__(self, kernel_size=7):
         super(SpatialAttention, self).__init__()
-        self.conv = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=kernel_size, stride=1, padding=(kernel_size - 1) // 2)
+        self.conv = nn.Conv2d(in_channels=2, out_channels=1, kernel_size=kernel_size, stride=1,
+                              padding=(kernel_size - 1) // 2)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -113,7 +122,6 @@ class SpatialAttention(nn.Module):
         return out
 
 
-
 class FCU(nn.Module):
     def __init__(self, in_out_channels, kernel_size=3, dilation=1, dropout_prob=0):
         super(FCU, self).__init__()
@@ -122,17 +130,25 @@ class FCU(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.drop = nn.Dropout2d(p=dropout_prob)
         # left branch
-        self.left_conv1 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1, padding=(padding, 0), dilation=dilation, bias=False)
-        self.left_conv2 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1, padding=(0, padding), dilation=dilation, bias=False)
-        self.left_conv3 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1, padding=(padding, 0), dilation=dilation, bias=False)
-        self.left_conv4 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1, padding=(0, padding), dilation=dilation, bias=False)
+        self.left_conv1 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1,
+                                    padding=(padding, 0), dilation=dilation, bias=False)
+        self.left_conv2 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1,
+                                    padding=(0, padding), dilation=dilation, bias=False)
+        self.left_conv3 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1,
+                                    padding=(padding, 0), dilation=dilation, bias=False)
+        self.left_conv4 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1,
+                                    padding=(0, padding), dilation=dilation, bias=False)
         self.left_bn1 = nn.BatchNorm2d(num_features=inter_channels)
         self.left_bn2 = nn.BatchNorm2d(num_features=inter_channels)
         # right branch
-        self.right_conv1 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1, padding=(0, padding), dilation=dilation, bias=False)
-        self.right_conv2 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1, padding=(padding, 0), dilation=dilation, bias=False)
-        self.right_conv3 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1, padding=(0, padding), dilation=dilation, bias=False)
-        self.right_conv4 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1, padding=(padding, 0), dilation=dilation, bias=False)
+        self.right_conv1 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1,
+                                     padding=(0, padding), dilation=dilation, bias=False)
+        self.right_conv2 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1,
+                                     padding=(padding, 0), dilation=dilation, bias=False)
+        self.right_conv3 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(1, kernel_size), stride=1,
+                                     padding=(0, padding), dilation=dilation, bias=False)
+        self.right_conv4 = nn.Conv2d(inter_channels, inter_channels, kernel_size=(kernel_size, 1), stride=1,
+                                     padding=(padding, 0), dilation=dilation, bias=False)
         self.right_bn1 = nn.BatchNorm2d(num_features=inter_channels)
         self.right_bn2 = nn.BatchNorm2d(num_features=inter_channels)
 
@@ -158,8 +174,7 @@ class FCU(nn.Module):
         return out
 
 
-
-class Model1(nn.Module):
+class Model1(nn.Module):  # Total params: 837,014
     def __init__(self):
         super(Model1, self).__init__()
         # Stage 1
@@ -180,17 +195,17 @@ class Model1(nn.Module):
         self.conv10 = FCU(in_out_channels=128, kernel_size=3, dilation=2, dropout_prob=0.03)
         self.conv11 = FCU(in_out_channels=128, kernel_size=3, dilation=5, dropout_prob=0.03)
         self.conv12 = FCU(in_out_channels=128, kernel_size=3, dilation=9, dropout_prob=0.03)
-        #decoder 1
-        self.upsample1 = UpsampleBlock(in_channels=128,out_channels=64)
-        self.ff1 = FeatureFusion1(decoder_in_channels=128,encoder_in_channels=64)
-        self.conv13 = FCU(in_out_channels=64,kernel_size=5,dilation=1,dropout_prob=0)
+        # decoder 1
+        self.upsample1 = UpsampleBlock(in_channels=128, out_channels=128)
+        self.ff1 = FeatureFusion1(decoder_in_channels=128, encoder_in_channels=64)
+        self.conv13 = FCU(in_out_channels=64, kernel_size=5, dilation=1, dropout_prob=0)
         self.conv14 = FCU(in_out_channels=64, kernel_size=5, dilation=1, dropout_prob=0)
-        #decoder 2
-        self.upsample2 = UpsampleBlock(in_channels=64,out_channels=32)
-        self.ff2 = FeatureFusion1(decoder_in_channels=64,encoder_in_channels=32)
-        self.conv15 = FCU(in_out_channels=32,kernel_size=3,dilation=1,dropout_prob=0)
+        # decoder 2
+        self.upsample2 = UpsampleBlock(in_channels=64, out_channels=64)
+        self.ff2 = FeatureFusion1(decoder_in_channels=64, encoder_in_channels=32)
+        self.conv15 = FCU(in_out_channels=32, kernel_size=3, dilation=1, dropout_prob=0)
         self.conv16 = FCU(in_out_channels=32, kernel_size=3, dilation=1, dropout_prob=0)
-        self.conv_pred =  nn.ConvTranspose2d(32, 1, kernel_size=2, stride=2, padding=0, output_padding=0, bias=True)
+        self.conv_pred = nn.ConvTranspose2d(32, 1, kernel_size=2, stride=2, padding=0, output_padding=0, bias=True)
 
     def forward(self, x):
         # encoder 1
@@ -204,11 +219,11 @@ class Model1(nn.Module):
         encoder3 = self.conv12(self.conv11(self.conv10(encoder3)))
         # decoder 1
         decoder1 = self.upsample1(encoder3)
-        decoder1 = self.ff1(decoder1,encoder2)
+        decoder1 = self.ff1(decoder1, encoder2)
         decoder1 = self.conv14(self.conv13(decoder1))
         # decoder 2
         decoder2 = self.upsample2(decoder1)
-        decoder2 = self.ff2(decoder2,encoder1)
+        decoder2 = self.ff2(decoder2, encoder1)
         decoder2 = self.conv16(self.conv15(decoder2))
         # finnal pred
         out = self.conv_pred(decoder2)
