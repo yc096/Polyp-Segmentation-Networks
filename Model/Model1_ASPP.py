@@ -99,7 +99,26 @@ class FCU(nn.Module):
         return out
 
 
-class Model1(nn.Module):  # Total params: 727,440
+class ContextFeatureExtraction(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(ContextFeatureExtraction, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=1,groups=out_channels // 4,  stride=1, padding=0)
+        self.conv2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3,groups=out_channels // 4, stride=1, padding=1 * 3, dilation=3)
+        self.conv3 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3,groups=out_channels // 4, stride=1, padding=1 * 5, dilation=5)
+        self.conv4 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3,groups=out_channels // 4, stride=1, padding=1 * 7, dilation=7)
+        self.bn = nn.BatchNorm2d(num_features=out_channels)
+
+    def forward(self, x):
+        x1 = self.conv1(x)
+        x2 = self.conv2(x)
+        x3 = self.conv3(x)
+        x4 = self.conv4(x)
+        out = torch.cat([x1, x2, x3, x4], dim=1)
+        out = self.bn(out)
+        return out
+
+
+class Model1(nn.Module):  # Total params: 731,408
     def __init__(self):
         super(Model1, self).__init__()
         # Stage 1
@@ -120,6 +139,8 @@ class Model1(nn.Module):  # Total params: 727,440
         self.conv10 = FCU(in_out_channels=128, kernel_size=3, dilation=2, dropout_prob=0.03)
         self.conv11 = FCU(in_out_channels=128, kernel_size=3, dilation=5, dropout_prob=0.03)
         self.conv12 = FCU(in_out_channels=128, kernel_size=3, dilation=9, dropout_prob=0.03)
+        #
+        self.cfe = ContextFeatureExtraction(in_channels=128, out_channels=128)
         # decoder 1
         self.upsample1 = UpsampleBlock(in_channels=128, out_channels=64)
         self.conv13 = FCU(in_out_channels=64, kernel_size=5, dilation=1, dropout_prob=0)
@@ -140,6 +161,8 @@ class Model1(nn.Module):  # Total params: 727,440
         # encoder 3
         encoder3 = self.downsample3(encoder2)
         encoder3 = self.conv12(self.conv11(self.conv10(encoder3)))
+        #
+        encoder3 = self.cfe(encoder3)
         # decoder 1
         decoder1 = self.upsample1(encoder3)
         decoder1 = self.conv14(self.conv13(decoder1))

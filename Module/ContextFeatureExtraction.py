@@ -4,6 +4,8 @@
 # @File : ContextFeatureExtraction.py
 import torch
 import torch.nn as nn
+
+
 class ContextFeatureExtraction(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(ContextFeatureExtraction, self).__init__()
@@ -11,7 +13,7 @@ class ContextFeatureExtraction(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3, stride=1, padding=1 * 3, dilation=3)
         self.conv3 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3, stride=1, padding=1 * 5, dilation=5)
         self.conv4 = nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 4, kernel_size=3, stride=1, padding=1 * 7, dilation=7)
-        self.bn = nn.BatchNorm2d(num_features=128)
+        self.bn = nn.BatchNorm2d(num_features=out_channels)
 
     def forward(self, x):
         x1 = self.conv1(x)

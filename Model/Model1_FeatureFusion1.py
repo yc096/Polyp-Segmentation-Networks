@@ -173,7 +173,6 @@ class FCU(nn.Module):
         out = channel_shuffle(out, g_number=2)
         return out
 
-
 class Model1(nn.Module):  # Total params: 837,014
     def __init__(self):
         super(Model1, self).__init__()

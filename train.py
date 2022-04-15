@@ -14,7 +14,7 @@ if __name__ == '__main__':
     # 选择设备
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # 构建模型
-    from Model.Model1_FeatureFusion1 import Model1
+    from Model.Model1_ASPP import Model1
     model = Model1().to(device)
     # 构建损失函数
     criterion = structure_loss()
