@@ -65,3 +65,9 @@ class SpatialAttention(nn.Module):
         out = self.conv(out)
         out = self.sigmoid(out)
         return out
+
+# FeatureFusion1(decoder_in_channels=128,encoder_in_channels=128)Total params: 37,475
+# FeatureFusion1(decoder_in_channels=128,encoder_in_channels=64) Total params: 13,667
+# FeatureFusion1(decoder_in_channels=64,encoder_in_channels=64) Total params: 9,571
+# FeatureFusion1(decoder_in_channels=64,encoder_in_channels=32) Total params: 3,555
+# FeatureFusion1(decoder_in_channels=32,encoder_in_channels=32) Total params: 2,531
