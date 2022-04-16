@@ -12,6 +12,7 @@ from Utils.opencv_transform import ToTensor, Resize, RandomHorizontalFlip, Color
 
 class PolypDatasets(Dataset):
     def __init__(self, DATASET_NAME='', DATASET_TYPE='train'):
+        self.dataset_name = DATASET_NAME
         self.dataset_type = DATASET_TYPE
         self.dataset_path = os.path.join(Config.DATASET_ROOT, DATASET_NAME)
         self.train_size_h, self.train_size_w = Config.TRAIN_SIZE_H, Config.TRAIN_SIZE_W

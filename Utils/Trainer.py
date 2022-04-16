@@ -115,7 +115,7 @@ class Trainer():
                     self.metrics.add_batch(pred=outputs.detach().sigmoid(), mask=masks.detach(), threshold=0.5)
             epoch_time = round(self.getTime() - epoch_time, 4)
             epoch_loss = round(epoch_loss / len(data_loader), 4)
-            print(' loss:' + str(epoch_loss) + ' ' + self.metrics.show() + ' ' +Config.DATASETS_NAME_TEST[i])
+            print(' loss:' + str(epoch_loss) + ' ' + self.metrics.show() + ' ' +data_loader.dataset.dataset_name)
             excel.write(self.current_epoch, 0, self.current_epoch)
             excel.write(self.current_epoch, 1, epoch_loss)
             excel.write(self.current_epoch, 2, round(np.mean(self.metrics.postive_iou), 4))
