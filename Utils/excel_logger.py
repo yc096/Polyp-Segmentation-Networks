@@ -26,7 +26,7 @@ class excel_logger():
         worksheet.write(0, 8, 'recall')
         worksheet.write(0, 9, 'Time')
         worksheet.write(0, 10, '=MAX(C2:C{})'.format(Config.MAX_EPOCH + 1))
-        worksheet.write(0, 11, '=MATCH(K1,C2:{},0)'.format(Config.MAX_EPOCH + 1))
+        worksheet.write(0, 11, '=MATCH(K1,C2:C{},0)'.format(Config.MAX_EPOCH + 1))
         worksheet.write(0, 12, '=MAX(D2:D{})'.format(Config.MAX_EPOCH + 1))
         worksheet.write(0, 13, '=MATCH(M1,D2:D{},0)'.format(Config.MAX_EPOCH + 1))
         return worksheet
