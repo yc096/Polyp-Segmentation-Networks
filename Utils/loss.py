@@ -27,6 +27,29 @@ class structure_loss(nn.Module):
         return (wbce + wiou).mean()
 
 
+class structure_loss_x3(nn.Module):
+    def __init__(self):
+        super(structure_loss_x3, self).__init__()
+
+    def __call__(self, pred, mask):
+        p2 = self.structure_loss(pred[0], mask)
+        p3 = self.structure_loss(pred[1], mask)
+        p4 = self.structure_loss(pred[2], mask)
+        loss = p2 + p3 + p4
+        return loss
+
+    def structure_loss(self, pred, mask):
+        weit = 1 + 5 * torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)
+        wbce = F.binary_cross_entropy_with_logits(pred, mask, reduction='mean')
+        wbce = (weit * wbce).sum(dim=(2, 3)) / weit.sum(dim=(2, 3))
+
+        pred = torch.sigmoid(pred)
+        inter = ((pred * mask) * weit).sum(dim=(2, 3))
+        union = ((pred + mask) * weit).sum(dim=(2, 3))
+        wiou = 1 - (inter + 1) / (union - inter + 1)
+        return (wbce + wiou).mean()
+
+
 class structure_loss_PraNet(nn.Module):
     def __init__(self):
         super(structure_loss_PraNet, self).__init__()
@@ -79,7 +102,7 @@ class BinaryDiceLoss(nn.Module):
 
         inter = torch.sum(torch.mul(predict, target), dim=1) + self.smooth
         union = torch.sum(predict, dim=1) + torch.sum(target, dim=1) + self.smooth
-        loss = 1 - (2*inter / union)
+        loss = 1 - (2 * inter / union)
 
         if self.reduction == 'mean':
             return loss.mean()
@@ -89,4 +112,3 @@ class BinaryDiceLoss(nn.Module):
             return loss
         else:
             raise Exception('Unexpected reduction {}'.format(self.reduction))
-

@@ -20,9 +20,9 @@ def rename_image_mask(image_root, mask_root, file_name_index=1):
     assert len(image_list) == len(mask_list), RuntimeError('len(image_list != mask_list),got len(image_list):{} len(mask_list):'.format(len(image_list), len(mask_list)))
     image_list = sorted(image_list)
     mask_list = sorted(mask_list)
-    for index in range(len(image_list)):  # 默认image和mask文件名要一致，并不要求格式一样
-        assert image_list[index].split('.')[0] == mask_list[index].split('.')[0], RuntimeError(
-            'image.filename != mask.filename,got img.fname:{} mask.fname:{}'.format(image_list[index].split('.')[0], mask_list[index].split('.')[0]))
+    # for index in range(len(image_list)):  # 默认image和mask文件名要一致，并不要求格式一样
+    #     assert image_list[index].split('.')[0] == mask_list[index].split('.')[0], RuntimeError(
+    #         'image.filename != mask.filename,got img.fname:{} mask.fname:{}'.format(image_list[index].split('.')[0], mask_list[index].split('.')[0]))
     # 将所有image和mask拷贝到新的目录
     for index in range(len(image_list)):
         image_path = os.path.join(image_root, image_list[index])

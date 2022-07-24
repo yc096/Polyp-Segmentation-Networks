@@ -45,29 +45,29 @@ class metrics():
 
         smooth = 1e-5
         # IoU
-        negative_iou = round((TN + smooth) / (TN + FN + FP + smooth), 4)
-        postive_iou = round((TP + smooth) / (TP + FN + FP + smooth), 4)
+        negative_iou = (TN + smooth) / (TN + FN + FP + smooth)
+        postive_iou = (TP + smooth) / (TP + FN + FP + smooth)
         self.negative_iou.append(negative_iou)
         self.postive_iou.append(postive_iou)
 
         # Dice
-        dice = round((2 * TP + smooth) / (2 * TP + FP + FN + smooth), 4)
+        dice = (2 * TP + smooth) / (2 * TP + FP + FN + smooth)
         self.dice.append(dice)
 
         # Accuracy
-        accuracy = round((TP + TN) / (TN + FN + TP + FP), 4)
+        accuracy = (TP + TN) / (TN + FN + TP + FP)
         self.accuracy.append(accuracy)
 
         # Precision
-        precision = round((TP + smooth) / (TP + FP + smooth), 4)
+        precision = (TP + smooth) / (TP + FP + smooth)
         self.precision.append(precision)
 
         # Recall\Sensitivity
-        recall = round((TP + smooth) / (TP + FN + smooth), 4)
+        recall = (TP + smooth) / (TP + FN + smooth)
         self.recall.append(recall)
 
         # F1-score
-        f1 = round((2 * precision * recall + smooth) / (precision + recall + smooth), 4)
+        f1 = (2 * precision * recall + smooth) / (precision + recall + smooth)
         self.f1.append(f1)
 
         # Mean absolute error
@@ -80,7 +80,7 @@ class metrics():
             self.add(pred[index], mask[index], threshold)
 
     def show(self):
-        return 'IoU:{} Dice:{} accuracy:{} precision:{} recall:{} f1-score:{} MAE:{:4f}'.format(
+        return 'mIoU:{} mDice:{} accuracy:{} precision:{} recall:{} f1-score:{} MAE:{}'.format(
             round(np.mean(self.postive_iou), 4),
             round(np.mean(self.dice), 4),
             round(np.mean(self.accuracy), 4),

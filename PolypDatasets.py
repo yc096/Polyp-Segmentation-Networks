@@ -85,7 +85,7 @@ def get_train_data_loader(BATCH_SIZE=Config.BATCH_SIZE, NUM_WORERS=Config.NUM_WO
     return data_loader
 
 
-def get_test_data_loader(BATCH_SIZE=Config.BATCH_SIZE, NUM_WORERS=Config.BATCH_SIZE):
+def get_test_data_loader(BATCH_SIZE=Config.BATCH_SIZE, NUM_WORERS=Config.NUM_WORERS):
     data_loader = []
     for dataset_name in Config.DATASETS_NAME_TEST:
         data_loader.append(
@@ -93,7 +93,7 @@ def get_test_data_loader(BATCH_SIZE=Config.BATCH_SIZE, NUM_WORERS=Config.BATCH_S
                 PolypDatasets(DATASET_NAME=dataset_name, DATASET_TYPE='test'),
                 batch_size=BATCH_SIZE,
                 num_workers=NUM_WORERS,
-                shuffle=True
+                shuffle=False
             )
         )
     return data_loader
